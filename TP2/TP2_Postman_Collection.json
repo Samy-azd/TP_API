@@ -1,0 +1,575 @@
+{
+	"info": {
+		"_postman_id": "tp2-efrei-master2-spring-boot",
+		"name": "TP2 - Spring Boot REST APIs",
+		"description": "Collection Postman complète pour tester les 4 exercices du TP2 (Calculatrice, Devises, BMI & JWT, Documentation)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "alice_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "alice_refresh_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "bob_token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Exercice 1 - Calculatrice",
+			"item": [
+				{
+					"name": "1. Calcul - Addition (Succès 201)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"a\": 10,\n  \"b\": 5,\n  \"operation\": \"addition\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/calculator",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "calculator"]
+						}
+					}
+				},
+				{
+					"name": "2. Calcul - Multiplication (Succès 201)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"a\": 7,\n  \"b\": 8,\n  \"operation\": \"multiplication\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/calculator",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "calculator"]
+						}
+					}
+				},
+				{
+					"name": "3. Erreur - Division par zéro (400 Bad Request)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"a\": 10,\n  \"b\": 0,\n  \"operation\": \"division\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/calculator",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "calculator"]
+						}
+					}
+				},
+				{
+					"name": "4. Erreur - Validation DTO champ b manquant (400 Bad Request)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"a\": 15,\n  \"operation\": \"soustraction\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/calculator",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "calculator"]
+						}
+					}
+				},
+				{
+					"name": "5. Historique avec Pagination (Pageable)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/calculator/history?page=0&size=10&sort=date,desc",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "calculator", "history"],
+							"query": [
+								{ "key": "page", "value": "0" },
+								{ "key": "size", "value": "10" },
+								{ "key": "sort", "value": "date,desc" }
+							]
+						}
+					}
+				},
+				{
+					"name": "6. Obtenir par ID (Succès 200)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/calculator/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "calculator", "1"]
+						}
+					}
+				},
+				{
+					"name": "7. Mettre à jour une opération (PUT 200)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"a\": 25,\n  \"b\": 5,\n  \"operation\": \"soustraction\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/calculator/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "calculator", "1"]
+						}
+					}
+				},
+				{
+					"name": "8. Supprimer une opération (DELETE 200)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/calculator/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "calculator", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Exercice 2 - Devises et Taux Dynamiques",
+			"item": [
+				{
+					"name": "1. Conversion Taux Externe - USD vers EUR (Succès 200)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/currency/convert?amount=100&from=USD&to=EUR",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "currency", "convert"],
+							"query": [
+								{ "key": "amount", "value": "100" },
+								{ "key": "from", "value": "USD" },
+								{ "key": "to", "value": "EUR" }
+							]
+						}
+					}
+				},
+				{
+					"name": "2. Conversion Manuelle - Taux Custom (Succès 201)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"from\": \"USD\",\n  \"to\": \"XYZ\",\n  \"amount\": 100,\n  \"rate\": 1.25\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/currency/convert",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "currency", "convert"]
+						}
+					}
+				},
+				{
+					"name": "3. Mettre à jour un Taux Local (PUT 200)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"from\": \"EUR\",\n  \"to\": \"GBP\",\n  \"rate\": 0.85\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/currency/update-rate",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "currency", "update-rate"]
+						}
+					}
+				},
+				{
+					"name": "4. Conversion utilisant le Taux Local (GET 200)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/currency/convert?amount=100&from=EUR&to=GBP",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "currency", "convert"],
+							"query": [
+								{ "key": "amount", "value": "100" },
+								{ "key": "from", "value": "EUR" },
+								{ "key": "to", "value": "GBP" }
+							]
+						}
+					}
+				},
+				{
+					"name": "5. Erreur - Montant négatif (400 Bad Request)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/currency/convert?amount=-50&from=USD&to=EUR",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "currency", "convert"],
+							"query": [
+								{ "key": "amount", "value": "-50" },
+								{ "key": "from", "value": "USD" },
+								{ "key": "to", "value": "EUR" }
+							]
+						}
+					}
+				},
+				{
+					"name": "6. Supprimer une Transaction (DELETE 200)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/currency/delete-transaction/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "currency", "delete-transaction", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Exercice 3 - BMI & Authentification JWT",
+			"item": [
+				{
+					"name": "1. Inscription - Utilisateur Alice (POST 201)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"alice\",\n  \"password\": \"password123\",\n  \"email\": \"alice@example.com\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/register",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "2. Connexion - Alice (POST 200)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.accessToken) {",
+									"    pm.collectionVariables.set('alice_token', jsonData.accessToken);",
+									"    pm.collectionVariables.set('alice_refresh_token', jsonData.refreshToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"alice\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/login",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "3. Inscription - Utilisateur Bob (POST 201)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"bob\",\n  \"password\": \"password456\",\n  \"email\": \"bob@example.com\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/register",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "4. Connexion - Bob (POST 200)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.accessToken) {",
+									"    pm.collectionVariables.set('bob_token', jsonData.accessToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"bob\",\n  \"password\": \"password456\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/login",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "5. Erreur - Accès sans JWT (401 Unauthorized)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/bmi/history",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "bmi", "history"]
+						}
+					}
+				},
+				{
+					"name": "6. Calculer BMI - Alice (POST 201)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{ "key": "token", "value": "{{alice_token}}", "type": "string" }
+							]
+						},
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"weight\": 68.5,\n  \"height\": 1.75\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/bmi/calculate",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "bmi", "calculate"]
+						}
+					}
+				},
+				{
+					"name": "7. Historique BMI - Alice (GET 200)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{ "key": "token", "value": "{{alice_token}}", "type": "string" }
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/bmi/history",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "bmi", "history"]
+						}
+					}
+				},
+				{
+					"name": "8. Mettre à jour BMI - Alice (PUT 200)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{ "key": "token", "value": "{{alice_token}}", "type": "string" }
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"weight\": 65.0,\n  \"height\": 1.75\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/bmi/update/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "bmi", "update", "1"]
+						}
+					}
+				},
+				{
+					"name": "9. Erreur - Bob tente de supprimer le BMI d'Alice (403 Forbidden)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{ "key": "token", "value": "{{bob_token}}", "type": "string" }
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/bmi/delete/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "bmi", "delete", "1"]
+						}
+					}
+				},
+				{
+					"name": "10. Statistiques Globales BMI (GET 200)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{ "key": "token", "value": "{{alice_token}}", "type": "string" }
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/bmi/statistics",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "bmi", "statistics"]
+						}
+					}
+				},
+				{
+					"name": "11. Renouvellement Refresh Token (POST 200)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{alice_refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/auth/refresh",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "auth", "refresh"]
+						}
+					}
+				},
+				{
+					"name": "12. Suppression par le propriétaire Alice (DELETE 200)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{ "key": "token", "value": "{{alice_token}}", "type": "string" }
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/bmi/delete/1",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "8080",
+							"path": ["api", "bmi", "delete", "1"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

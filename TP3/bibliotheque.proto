@@ -1,0 +1,59 @@
+// ==============================================================================
+// TP3 - GraphQL et gRPC (Chapitre 5)
+// Tâche 10 : Définition de service gRPC avec Protocol Buffers (proto3)
+// ==============================================================================
+
+syntax = "proto3";
+
+package bibliotheque;
+
+option java_multiple_files = true;
+option java_package = "com.efrei.bibliotheque.grpc";
+option java_outer_classname = "BibliothequeProto";
+
+// ------------------------------------------------------------------------------
+// 1. Messages Protocol Buffers
+// ------------------------------------------------------------------------------
+
+// Message de requête contenant l'identifiant du livre recherché
+message LivreRequest {
+  int32 id = 1;
+}
+
+// Message de réponse contenant les informations demandées du livre
+message LivreResponse {
+  int32 id = 1;
+  string titre = 2;
+  string auteur = 3;
+  bool disponible = 4;
+}
+
+// Message de requête pour s'abonner aux notifications d'emprunts en continu
+message StreamEmpruntsRequest {
+  // Optionnel : filtre sur une catégorie ou un rayon
+  string categorie_filtre = 1;
+}
+
+// Événement d'emprunt diffusé en temps réel
+message EmpruntNotification {
+  int32 emprunt_id = 1;
+  int32 livre_id = 2;
+  string titre_livre = 3;
+  string utilisateur_nom = 4;
+  string timestamp = 5;
+}
+
+// ------------------------------------------------------------------------------
+// 2. Définition des Services gRPC
+// ------------------------------------------------------------------------------
+
+service LivreService {
+  // Méthode Unaire (RPC Unaire) :
+  // Le client envoie une seule requête LivreRequest et reçoit une unique réponse LivreResponse.
+  rpc GetLivre (LivreRequest) returns (LivreResponse);
+
+  // Méthode Server Streaming (Besoin 2) :
+  // Le tableau de bord envoie une requête d'écoute initiale, et le serveur
+  // diffuse un flux continu de notifications à chaque nouvel emprunt.
+  rpc SuivreEmpruntsEnTempsReel (StreamEmpruntsRequest) returns (stream EmpruntNotification);
+}

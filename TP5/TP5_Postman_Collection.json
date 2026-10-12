@@ -1,0 +1,444 @@
+{
+  "info": {
+    "_postman_id": "tp5-securite-spring-boot",
+    "name": "TP5 - Sécurisation d'une API REST (Spring Boot)",
+    "description": "Lancer d'abord l'API (TP5/lancer_api.ps1) : https://localhost:8443.\n\nCertificat auto-signé : la vérification SSL est désactivée sur chaque requête. Si Postman bloque quand même : Settings → General → SSL certificate verification = OFF.\n\nOrdre conseillé : dossier 0 (logins, qui enregistrent les tokens dans les variables jwt_user / jwt_admin), puis les scénarios 1 à 8 dans l'ordre.\n\nRate limiting : 5 requêtes par minute, par IP et par endpoint. Si un scénario renvoie 429 par erreur, attendre 1 minute.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "jwt_user",
+      "value": ""
+    },
+    {
+      "key": "jwt_admin",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "0 - Connexion (à lancer en premier)",
+      "item": [
+        {
+          "name": "Login user (user / user123)",
+          "protocolProfileBehavior": {
+            "strictSSL": false
+          },
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://localhost:8443/auth/login",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8443",
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Renvoie un JWT de rôle user, enregistré dans la variable jwt_user.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user\",\n  \"password\": \"user123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('jwt_user', pm.response.json().token);",
+                  "console.log('jwt_user enregistré');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login admin (admin / admin123)",
+          "protocolProfileBehavior": {
+            "strictSSL": false
+          },
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://localhost:8443/auth/login",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8443",
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Renvoie un JWT de rôle admin, enregistré dans la variable jwt_admin. Capture → images/ex2_login_admin.png",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('jwt_admin', pm.response.json().token);",
+                  "console.log('jwt_admin enregistré');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Exercice 6 - Scénarios de test",
+      "item": [
+        {
+          "name": "1 - Sans clé API → 401",
+          "protocolProfileBehavior": {
+            "strictSSL": false
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://localhost:8443/utilisateurs/user",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8443",
+              "path": [
+                "utilisateurs",
+                "user"
+              ]
+            },
+            "description": "Aucun en-tête Authorization. Attendu : 401 Unauthorized. Capture → images/ex6_1_sans_cle.png"
+          }
+        },
+        {
+          "name": "2 - Avec clé API valide → 200",
+          "protocolProfileBehavior": {
+            "strictSSL": false
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "ApiKey 123456abcdef",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://localhost:8443/utilisateurs/user",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8443",
+              "path": [
+                "utilisateurs",
+                "user"
+              ]
+            },
+            "description": "Attendu : 200 OK. Capture → images/ex6_2_cle_valide.png"
+          }
+        },
+        {
+          "name": "3 - JWT user sur /utilisateurs/user → autorisé",
+          "protocolProfileBehavior": {
+            "strictSSL": false
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_user}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://localhost:8443/utilisateurs/user",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8443",
+              "path": [
+                "utilisateurs",
+                "user"
+              ]
+            },
+            "description": "Attendu : 200 OK. Capture → images/ex6_3_jwt_user_user.png"
+          }
+        },
+        {
+          "name": "4 - JWT user sur /utilisateurs/admin → 403",
+          "protocolProfileBehavior": {
+            "strictSSL": false
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_user}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://localhost:8443/utilisateurs/admin",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8443",
+              "path": [
+                "utilisateurs",
+                "admin"
+              ]
+            },
+            "description": "Attendu : 403 Forbidden. Capture → images/ex6_4_jwt_user_admin.png"
+          }
+        },
+        {
+          "name": "5 - JWT admin sur /utilisateurs/admin → autorisé",
+          "protocolProfileBehavior": {
+            "strictSSL": false
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://localhost:8443/utilisateurs/admin",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8443",
+              "path": [
+                "utilisateurs",
+                "admin"
+              ]
+            },
+            "description": "Attendu : 200 OK. Capture → images/ex6_5_jwt_admin_admin.png"
+          }
+        },
+        {
+          "name": "6 - Rate limiting → 429 (cliquer Send 6 fois)",
+          "protocolProfileBehavior": {
+            "strictSSL": false
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://localhost:8443/utilisateurs/admin",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8443",
+              "path": [
+                "utilisateurs",
+                "admin"
+              ]
+            },
+            "description": "Cliquer sur Send plusieurs fois rapidement : à partir de la 6e requête de la minute sur cet endpoint → 429 Too Many Requests. Capture → images/ex6_6_rate_limit.png"
+          }
+        },
+        {
+          "name": "7a - Description contenant <script> (POST)",
+          "protocolProfileBehavior": {
+            "strictSSL": false
+          },
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_user}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://localhost:8443/utilisateurs",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8443",
+              "path": [
+                "utilisateurs"
+              ]
+            },
+            "description": "Attendu : 201 Created, description stockée échappée (&lt;script&gt;...). Capture → images/ex6_7_xss.png",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Samy\",\n  \"email\": \"samy@efrei.fr\",\n  \"description\": \"<script>alert('xss')</script>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "7b - Liste des utilisateurs stockés (GET)",
+          "protocolProfileBehavior": {
+            "strictSSL": false
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_user}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://localhost:8443/utilisateurs",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8443",
+              "path": [
+                "utilisateurs"
+              ]
+            },
+            "description": "Montre la donnée stockée neutralisée (facultatif)."
+          }
+        },
+        {
+          "name": "8 - Requête en http:// → échec",
+          "protocolProfileBehavior": {
+            "strictSSL": false
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "ApiKey 123456abcdef",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8443/utilisateurs/user",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8443",
+              "path": [
+                "utilisateurs",
+                "user"
+              ]
+            },
+            "description": "Attendu : 400 Bad Request « This combination of host and port requires TLS. » Capture → images/ex6_8_http.png"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Exercice 5 - Gestion centralisée des erreurs",
+      "item": [
+        {
+          "name": "Email invalide → 400 JSON uniforme",
+          "protocolProfileBehavior": {
+            "strictSSL": false
+          },
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_user}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://localhost:8443/utilisateurs",
+              "protocol": "https",
+              "host": [
+                "localhost"
+              ],
+              "port": "8443",
+              "path": [
+                "utilisateurs"
+              ]
+            },
+            "description": "Attendu : 400 avec {timestamp, status, error, message: \"Email invalide\"}. Capture → images/ex5_erreur_validation.png",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nom\": \"Samy\",\n  \"email\": \"pas-un-email\",\n  \"description\": \"test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

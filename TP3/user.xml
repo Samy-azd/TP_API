@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  TP3 - Formats de Données (Chapitre 3)
+  Tâche 2 : Transcription du profil utilisateur JSON en document XML valide.
+  
+  Choix de conception :
+  - Le champ 'id' est représenté comme un attribut de la balise racine <user id="1">
+    car c'est un identifiant technique unique (métadonnée de la ressource).
+  - Les champs applicatifs (name, username, email, phone, website) sont représentés
+    comme des éléments enfants car ce sont des données métier pouvant être enrichies.
+  - La sous-structure 'address' (et 'geo') ainsi que 'company' sont modélisées
+    par des éléments imbriqués hiérarchiquement.
+-->
+<user id="1">
+    <name>Leanne Graham</name>
+    <username>Bret</username>
+    <email>Sincere@april.biz</email>
+    <address>
+        <street>Kulas Light</street>
+        <suite>Apt. 556</suite>
+        <city>Gwenborough</city>
+        <zipcode>92998-3874</zipcode>
+        <geo>
+            <lat>-37.3159</lat>
+            <lng>81.1496</lng>
+        </geo>
+    </address>
+    <phone>1-770-736-8031 x56442</phone>
+    <website>hildegard.org</website>
+    <company>
+        <name>Romaguera-Crona</name>
+        <catchPhrase>Multi-layered client-server neural-net</catchPhrase>
+        <bs>harness real-time e-markets</bs>
+    </company>
+</user>

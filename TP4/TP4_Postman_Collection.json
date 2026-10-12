@@ -1,0 +1,103 @@
+{
+  "info": {
+    "_postman_id": "tp4-temps-reel-evenementiel",
+    "name": "TP4 - API Temps Réel et Événementielles",
+    "description": "Collection Postman pour exécuter et capturer les requêtes HTTP du TP4.\n\n⚠️ Le format de collection Postman v2.1 ne permet pas d'exporter des requêtes WebSocket : pour la Partie 1, créez la requête à la main (New → WebSocket → wss://ws.postman-echo.com/raw), voir la description du dossier Partie 1.\n\nAvant la Tâche 6 : ouvrez https://webhook.site, copiez votre URL unique et collez-la dans la variable de collection `webhook_url` (onglet Variables de la collection).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "webhook_url",
+      "value": "https://webhook.site/c62ed656-dd89-4965-9fee-e69e8c1f3161",
+      "type": "string"
+    },
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Partie 1 - WebSockets (à créer manuellement)",
+      "description": "Postman n'exporte pas les requêtes WebSocket dans une collection v2.1. Procédure :\n\nTâche 1 : New → WebSocket → URL wss://ws.postman-echo.com/raw → Connect. Capturer le statut « 101 Switching Protocols » (cliquer sur l'événement « Connected » pour voir les en-têtes du handshake : Upgrade: websocket, Sec-WebSocket-Accept...). → images/tache1_websocket_connexion.png\n\nTâche 2 : Envoyer « Bonjour serveur », puis « Second message sans reconnexion » sans se reconnecter. Capturer le panneau Messages (flèches ↑ envoyé / ↓ reçu). → images/tache2_websocket_messages.png\n\nTâche 3 : Cliquer sur Disconnect, puis Connect à nouveau. Capturer le panneau Messages montrant la nouvelle session vide. → images/tache3_websocket_reconnexion.png",
+      "item": []
+    },
+    {
+      "name": "Partie 2 - Server-Sent Events",
+      "item": [
+        {
+          "name": "Tâche 4 - Flux SSE Wikimedia EventStreams",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/event-stream",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "https://stream.wikimedia.org/v2/stream/recentchange",
+              "protocol": "https",
+              "host": ["stream", "wikimedia", "org"],
+              "path": ["v2", "stream", "recentchange"]
+            },
+            "description": "Flux SSE public de Wikimedia. Postman affiche les événements au fil de l'eau (event / id / data). Cliquer sur « Cancel » pour fermer le flux. Pour le rapport, la capture du terminal avec la commande curl est préférable : curl -N https://stream.wikimedia.org/v2/stream/recentchange | head -n 15 → images/tache4_sse_wikimedia.png"
+          }
+        },
+        {
+          "name": "Tâche 5 - Endpoint SSE /horloge (Spring Boot)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/event-stream",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/horloge",
+              "host": ["{{base_url}}"],
+              "path": ["horloge"]
+            },
+            "description": "Nécessite l'application TP4/horloge-sse démarrée (lancer_horloge.ps1). Le TP demande la capture DANS LE NAVIGATEUR : ouvrir http://localhost:8080/horloge dans Chrome/Edge → images/tache5_horloge_navigateur.png. Cette requête Postman sert de vérification complémentaire (20 événements, un par seconde)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Partie 3 - Webhooks",
+      "item": [
+        {
+          "name": "Tâche 6 - POST Webhook paiement.reussi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"evenement\": \"paiement.reussi\",\n  \"montant\": 49.90,\n  \"transactionId\": \"tx_8827\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{webhook_url}}",
+              "host": ["{{webhook_url}}"]
+            },
+            "description": "Simule l'envoi d'un Webhook de paiement. Renseigner d'abord la variable webhook_url. Capture Postman → images/tache6_webhook_postman.png ; puis capture de la requête reçue sur webhook.site (méthode, en-têtes, corps) → images/tache7_webhook_site.png"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+# ==============================================================================
+# TP3 - GraphQL et gRPC (Chapitre 5)
+# Tâche 9 : Schéma GraphQL pour la gestion d'une bibliothèque en ligne
+# ==============================================================================
+
+"""
+Représente un livre au sein du catalogue de la bibliothèque.
+"""
+type Livre {
+  id: ID!
+  titre: String!
+  isbn: String!
+  disponible: Boolean!
+  nbPages: Int
+  
+  """
+  L'auteur ayant rédigé ce livre (relation 1-1 / N-1).
+  """
+  auteur: Auteur!
+  
+  """
+  Liste des emprunts associés à cet ouvrage.
+  Permet de filtrer uniquement les emprunts actuellement en cours.
+  """
+  emprunts(enCoursSeulement: Boolean = true): [Emprunt!]!
+}
+
+"""
+Représente un auteur de la bibliothèque.
+"""
+type Auteur {
+  id: ID!
+  nom: String!
+  biographie: String
+  nationalite: String
+  
+  """
+  Tous les livres écrits par cet auteur.
+  """
+  livres: [Livre!]!
+}
+
+"""
+Représente un emprunt d'un livre par un adhérent.
+"""
+type Emprunt {
+  id: ID!
+  dateEmprunt: String!
+  dateRetourPrevue: String!
+  dateRetourEffective: String
+  enCours: Boolean!
+  
+  """
+  Le livre faisant l'objet de cet emprunt.
+  """
+  livre: Livre!
+  
+  """
+  L'emprunteur / adhérent ayant contracté l'emprunt.
+  """
+  utilisateur: Utilisateur!
+}
+
+"""
+Représente un utilisateur / adhérent de la bibliothèque.
+"""
+type Utilisateur {
+  id: ID!
+  nom: String!
+  email: String!
+}
+
+"""
+Point d'entrée racine pour les opérations de lecture (Queries).
+"""
+type Query {
+  """
+  Récupère un livre spécifique à partir de son identifiant unique.
+  Permet d'obtenir en un seul appel le livre, son auteur et ses emprunts en cours.
+  """
+  livre(id: ID!): Livre
+  
+  """
+  Lister tous les livres du catalogue, avec option de filtrage par disponibilité.
+  """
+  livres(disponible: Boolean): [Livre!]!
+  
+  """
+  Récupérer un auteur spécifique par son identifiant.
+  """
+  auteur(id: ID!): Auteur
+}
+
+# ==============================================================================
+# Exemple de requête GraphQL permettant de récupérer un livre avec son auteur
+# et la liste de ses emprunts en cours (sans over-fetching ni under-fetching) :
+# ==============================================================================
+# query ObtenirLivreComplet {
+#   livre(id: "42") {
+#     id
+#     titre
+#     disponible
+#     auteur {
+#       id
+#       nom
+#     }
+#     emprunts(enCoursSeulement: true) {
+#       id
+#       dateEmprunt
+#       dateRetourPrevue
+#       enCours
+#       utilisateur {
+#         nom
+#         email
+#       }
+#     }
+#   }
+# }

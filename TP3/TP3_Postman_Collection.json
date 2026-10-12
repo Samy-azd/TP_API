@@ -1,0 +1,213 @@
+{
+  "info": {
+    "_postman_id": "tp3-formats-rest-graphql-grpc",
+    "name": "TP3 - Formats de Données, REST/SOAP et GraphQL/gRPC",
+    "description": "Collection Postman prête à l'emploi pour exécuter et capturer toutes les requêtes du TP3.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Partie 1 - Formats de Données (Chapitre 3)",
+      "item": [
+        {
+          "name": "Tâche 1 - GET Users 1 (Types JSON)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/users/1",
+              "protocol": "https",
+              "host": ["jsonplaceholder", "typicode", "com"],
+              "path": ["users", "1"]
+            },
+            "description": "Récupération d'un profil utilisateur pour identifier les 6 types JSON du cours."
+          }
+        },
+        {
+          "name": "Tâche 3.1 - GET Status 406 (Not Acceptable)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/status/406",
+              "protocol": "https",
+              "host": ["httpbin", "org"],
+              "path": ["status", "406"]
+            },
+            "description": "Observation du code HTTP 406 (Not Acceptable) lors de la négociation de contenu."
+          }
+        },
+        {
+          "name": "Tâche 3.2 - GET Status 415 (Unsupported Media Type)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/status/415",
+              "protocol": "https",
+              "host": ["httpbin", "org"],
+              "path": ["status", "415"]
+            },
+            "description": "Observation du code HTTP 415 (Unsupported Media Type)."
+          }
+        },
+        {
+          "name": "Tâche 3.3 - POST Anything (XML Body & Content-Type)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/xml",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<user id=\"1\">\n    <name>Leanne Graham</name>\n    <email>Sincere@april.biz</email>\n</user>",
+              "options": {
+                "raw": {
+                  "language": "xml"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://httpbin.org/anything",
+              "protocol": "https",
+              "host": ["httpbin", "org"],
+              "path": ["anything"]
+            },
+            "description": "Envoi d'un corps XML avec l'en-tête Content-Type: application/xml pour observer l'écho des en-têtes."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Partie 2 - REST et SOAP (Chapitre 4)",
+      "item": [
+        {
+          "name": "Tâche 5 - POST Posts (Test Non-Idempotence)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test Idempotence\",\n  \"body\": \"Démonstration de la non-idempotence de POST\",\n  \"userId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://jsonplaceholder.typicode.com/posts",
+              "protocol": "https",
+              "host": ["jsonplaceholder", "typicode", "com"],
+              "path": ["posts"]
+            },
+            "description": "À exécuter deux fois de suite avec le même corps pour tester l'idempotence."
+          }
+        },
+        {
+          "name": "Tâche 6 - POST SOAP Calculator (Add 4 + 7)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "text/xml; charset=utf-8",
+                "type": "text"
+              },
+              {
+                "key": "SOAPAction",
+                "value": "http://tempuri.org/Add",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  <soap:Body>\n    <Add xmlns=\"http://tempuri.org/\">\n      <intA>4</intA>\n      <intB>7</intB>\n    </Add>\n  </soap:Body>\n</soap:Envelope>",
+              "options": {
+                "raw": {
+                  "language": "xml"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://www.dneonline.com/calculator.asmx",
+              "protocol": "http",
+              "host": ["www", "dneonline", "com"],
+              "path": ["calculator.asmx"]
+            },
+            "description": "Appel d'un web service SOAP avec enveloppe XML pour effectuer une addition."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Partie 3 - GraphQL et gRPC (Chapitre 5)",
+      "item": [
+        {
+          "name": "Tâche 7 - GraphQL Rick & Morty (Under-fetching)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query {\n  character(id: 1) {\n    name\n    status\n    species\n    episode {\n      name\n      air_date\n    }\n  }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "https://rickandmortyapi.com/graphql",
+              "protocol": "https",
+              "host": ["rickandmortyapi", "com"],
+              "path": ["graphql"]
+            },
+            "description": "Récupération en un seul appel du personnage et de ses 51 épisodes (évite l'under-fetching REST)."
+          }
+        },
+        {
+          "name": "Tâche 8 - GraphQL Rick & Morty (Over-fetching)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query {\n  character(id: 1) {\n    name\n  }\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "https://rickandmortyapi.com/graphql",
+              "protocol": "https",
+              "host": ["rickandmortyapi", "com"],
+              "path": ["graphql"]
+            },
+            "description": "Sélection ciblée du champ name seul (évite l'over-fetching REST)."
+          }
+        }
+      ]
+    }
+  ]
+}
